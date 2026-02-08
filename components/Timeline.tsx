@@ -89,18 +89,18 @@ export default function Timeline({ initialSentences }: TimelineProps) {
                     animationDelay: `${(index % ITEMS_PER_PAGE) * 0.1}s`,
                   }}
                 >
+                  {/* 时间点圆圈 */}
+                  <div className="absolute left-[13px] sm:left-[26px] top-3 w-3 h-3 sm:w-4 sm:h-4 bg-white border-2 sm:border-4 border-blue-500 rounded-full shadow-lg"></div>
+
                   {/* 时间节点 */}
-                  <div className="absolute left-0 top-2 w-10 sm:w-16 text-right pr-1 sm:pr-0">
-                    <div className="text-xs sm:text-sm font-semibold text-gray-700 whitespace-nowrap">
+                  <div className="absolute left-[-4px] sm:left-[10px] top-8 sm:top-9 text-center">
+                    <div className="text-[10px] sm:text-xs font-semibold text-gray-700 whitespace-nowrap">
                       {monthDay}
                     </div>
-                    <div className="text-[10px] sm:text-xs text-gray-500">
+                    <div className="text-[8px] sm:text-[10px] text-gray-500">
                       {year}
                     </div>
                   </div>
-
-                  {/* 时间点圆圈 */}
-                  <div className="absolute left-[13px] sm:left-[26px] top-3 w-3 h-3 sm:w-4 sm:h-4 bg-white border-2 sm:border-4 border-blue-500 rounded-full shadow-lg"></div>
 
                   {/* 内容卡片 */}
                   <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-xl transition-shadow duration-300">
