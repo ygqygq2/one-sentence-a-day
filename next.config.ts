@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "export",
-  basePath: "/once-sentence-a-day",
+  basePath: "/one-sentence-a-day",
   images: {
     unoptimized: true,
   },
