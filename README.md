@@ -1,5 +1,19 @@
 # 每天一句话
 
+## 使用提示
+
+下面流程照着点就行，不需要会写代码：
+
+1. 打开这个仓库的页面，点击 **Agent**（仓库里的 AI 助手）。
+2. 在对话里输入：
+	- `今日一句话：每天都比昨天进步一点点 - 昵称`
+3. Agent 会帮你生成改动并开一个 **Pull requests**。
+4. 点击 **Pull requests**，找到刚刚新开的那个，点进去。
+5. 点击 **Ready for review**（如果看到这个按钮）。
+6. 点击 **Merge** 合并。
+7. 合并完成后，点击 **Delete branch**。
+8. 等一会儿，网页就更新生效啦 ✅
+
 一个用 Next.js + TypeScript + Tailwind CSS 构建的静态网站，用于展示每天记录的一句话。
 
 ## 特性
@@ -12,7 +26,7 @@
 
 ## 技术栈
 
-- [Next.js 15](https://nextjs.org/) - React 框架
+- [Next.js](https://nextjs.org/) - React 框架
 - [TypeScript](https://www.typescriptlang.org/) - 类型安全
 - [Tailwind CSS](https://tailwindcss.com/) - 样式框架
 
@@ -60,7 +74,7 @@ data/
 
 - 最新的句子显示在最上面
 - 自动按日期降序排列
-- 向下滚动时自动加载更多内容（每页 10 条）
+- 向下滚动时自动加载更多内容
 - 优雅的动画效果
 
 ## 部署
