@@ -2,9 +2,11 @@
 
 import { Sentence } from "@/lib/data";
 import { useEffect, useState, useRef, useCallback } from "react";
+import LikeButton from "./LikeButton";
 
 interface TimelineProps {
   initialSentences: Sentence[];
+  initialLikes: { [date: string]: number };
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -18,12 +20,13 @@ function formatDate(dateStr: string) {
   };
 }
 
-export default function Timeline({ initialSentences }: TimelineProps) {
+export default function Timeline({ initialSentences, initialLikes }: TimelineProps) {
   const [displayedSentences, setDisplayedSentences] = useState<Sentence[]>(
     initialSentences.slice(0, ITEMS_PER_PAGE)
   );
   const [hasMore, setHasMore] = useState(initialSentences.length > ITEMS_PER_PAGE);
   const [isLoading, setIsLoading] = useState(false);
+  const [likes, setLikes] = useState(initialLikes);
   const observerTarget = useRef<HTMLDivElement>(null);
 
   const loadMore = useCallback(() => {
@@ -66,16 +69,10 @@ export default function Timeline({ initialSentences }: TimelineProps) {
   }, [loadMore]);
 
   return (
-    <div className="w-full min-h-screen">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <header className="text-center mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">每天一句话</h1>
-          <p className="text-sm sm:text-base text-gray-600">每天随便一句话</p>
-        </header>
-
-        <div className="relative">
-          {/* 时间线 */}
-          <div className="absolute left-4 sm:left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-200 to-indigo-200"></div>
+    <div className="w-full">
+      <div className="relative">
+        {/* 时间线 */}
+        <div className="absolute left-4 sm:left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-200 to-indigo-200"></div>
 
           {/* 句子列表 */}
           <div className="space-y-6 sm:space-y-8">
@@ -104,7 +101,18 @@ export default function Timeline({ initialSentences }: TimelineProps) {
 
                   {/* 内容卡片 */}
                   <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-xl transition-shadow duration-300">
-                    <p className="text-sm sm:text-base text-gray-800 leading-relaxed">{sentence.content}</p>
+                    <p className="text-sm sm:text-base text-gray-800 leading-relaxed mb-4">{sentence.content}</p>
+                    
+                    {/* 点赞按钮 */}
+                    <div className="flex justify-end">
+                      <LikeButton 
+                        date={sentence.date} 
+                        initialLikes={likes[sentence.date] || 0}
+                        onLikeChange={(newCount) => {
+                          setLikes(prev => ({ ...prev, [sentence.date]: newCount }));
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               );
@@ -135,26 +143,25 @@ export default function Timeline({ initialSentences }: TimelineProps) {
               <p className="text-gray-500 text-base sm:text-lg">还没有记录，开始写下第一句话吧！</p>
             </div>
           )}
-        </div>
-
-        <style jsx>{`
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-
-          .animate-fadeIn {
-            animation: fadeIn 0.6s ease-out forwards;
-            opacity: 0;
-          }
-        `}</style>
       </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 0.6s ease-out forwards;
+          opacity: 0;
+        }
+      `}</style>
     </div>
   );
 }
