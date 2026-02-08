@@ -2,31 +2,49 @@
 
 import { Sentence } from '@/lib/data';
 import { useEffect, useState } from 'react';
+import { getAllLikes } from '@/lib/cloudflare-api';
 
 interface TopLikesProps {
   sentences: Sentence[];
-  likesData: { [date: string]: number };
 }
 
 interface RankedSentence extends Sentence {
   likes: number;
 }
 
-export default function TopLikes({ sentences, likesData }: TopLikesProps) {
+export default function TopLikes({ sentences }: TopLikesProps) {
   const [topSentences, setTopSentences] = useState<RankedSentence[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 合并句子和点赞数据，排序
-    const ranked = sentences
-      .map(s => ({
-        ...s,
-        likes: likesData[s.date] || 0
-      }))
-      .sort((a, b) => b.likes - a.likes)
-      .slice(0, 10); // 只显示前 10 名
+    async function fetchAndRank() {
+      try {
+        const likesData = await getAllLikes();
+        
+        // 合并句子和点赞数据，排序
+        const ranked = sentences
+          .map(s => ({
+            ...s,
+            likes: likesData[s.date] || 0
+          }))
+          .filter(s => s.likes > 0)  // 只显示有点赞的
+          .sort((a, b) => b.likes - a.likes)
+          .slice(0, 10); // 只显示前 10 名
 
-    setTopSentences(ranked);
-  }, [sentences, likesData]);
+        setTopSentences(ranked);
+      } catch (error) {
+        console.error('Failed to fetch likes:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchAndRank();
+    
+    // 每30秒刷新一次
+    const interval = setInterval(fetchAndRank, 30000);
+    return () => clearInterval(interval);
+  }, [sentences]);
 
   // 格式化日期
   const formatDate = (dateStr: string) => {
@@ -42,8 +60,17 @@ export default function TopLikes({ sentences, likesData }: TopLikesProps) {
       </h2>
 
       <div className="space-y-3">
-        {topSentences.length === 0 ? (
-          <p className="text-gray-500 text-sm text-center py-8">暂无数据</p>
+        {isLoading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="animate-pulse">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-3 bg-gray-100 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
+        ) : topSentences.length === 0 ? (
+          <p className="text-gray-500 text-sm text-center py-8">暂无点赞数据</p>
         ) : (
           topSentences.map((sentence, index) => (
             <div

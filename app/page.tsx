@@ -1,11 +1,9 @@
 import { getAllSentences } from "@/lib/data";
-import { getAllLikes } from "@/lib/cloudflare-api";
 import Timeline from "@/components/Timeline";
 import TopLikes from "@/components/TopLikes";
 
 export default async function Home() {
   const sentences = await getAllSentences();
-  const likesData = await getAllLikes();
 
   return (
     <div className="w-full h-screen flex flex-col bg-gray-50 overflow-hidden">
@@ -20,12 +18,12 @@ export default async function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 h-full">
           {/* 左侧：时间线（独立滚动） */}
           <div className="lg:col-span-8 h-full overflow-y-auto overscroll-contain">
-            <Timeline initialSentences={sentences} initialLikes={likesData} />
+            <Timeline initialSentences={sentences} />
           </div>
 
           {/* 右侧：点赞排行榜（独立滚动） */}
           <aside className="hidden lg:block lg:col-span-4 h-full overflow-y-auto overscroll-contain">
-            <TopLikes sentences={sentences} likesData={likesData} />
+            <TopLikes sentences={sentences} />
           </aside>
         </div>
       </div>

@@ -2,11 +2,11 @@
 
 import { Sentence } from "@/lib/data";
 import { useEffect, useState, useRef, useCallback } from "react";
+import { getAllLikes } from "@/lib/cloudflare-api";
 import LikeButton from "./LikeButton";
 
 interface TimelineProps {
   initialSentences: Sentence[];
-  initialLikes: { [date: string]: number };
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -20,14 +20,23 @@ function formatDate(dateStr: string) {
   };
 }
 
-export default function Timeline({ initialSentences, initialLikes }: TimelineProps) {
+export default function Timeline({ initialSentences }: TimelineProps) {
   const [displayedSentences, setDisplayedSentences] = useState<Sentence[]>(
     initialSentences.slice(0, ITEMS_PER_PAGE)
   );
   const [hasMore, setHasMore] = useState(initialSentences.length > ITEMS_PER_PAGE);
   const [isLoading, setIsLoading] = useState(false);
-  const [likes, setLikes] = useState(initialLikes);
+  const [likes, setLikes] = useState<{ [date: string]: number }>({});
   const observerTarget = useRef<HTMLDivElement>(null);
+
+  // 客户端获取点赞数据
+  useEffect(() => {
+    async function fetchLikes() {
+      const likesData = await getAllLikes();
+      setLikes(likesData);
+    }
+    fetchLikes();
+  }, []);
 
   const loadMore = useCallback(() => {
     if (isLoading || !hasMore) return;

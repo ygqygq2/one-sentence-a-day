@@ -86,7 +86,7 @@ export default function LikeButton({ date, initialLikes, onLikeChange }: LikeBut
       disabled={!canLike || isLoading}
       className={`
         flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm
-        transition-all duration-200
+        transition-all duration-200 relative
         ${!canLike
           ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
           : 'bg-gray-100 hover:bg-pink-50 text-gray-600 hover:text-pink-600 hover:scale-105 cursor-pointer'
@@ -102,9 +102,12 @@ export default function LikeButton({ date, initialLikes, onLikeChange }: LikeBut
       >
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
       </svg>
-      <span className="font-medium">
-        {!canLike && cooldownSeconds > 0 ? `${cooldownSeconds}s` : likes}
-      </span>
+      <span className="font-medium">{likes}</span>
+      {!canLike && cooldownSeconds > 0 && (
+        <span className="absolute -top-1 -right-1 bg-gray-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center">
+          {cooldownSeconds}
+        </span>
+      )}
     </button>
   );
 }
