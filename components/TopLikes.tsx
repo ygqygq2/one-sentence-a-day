@@ -159,17 +159,27 @@ export default function TopLikes({ sentences }: TopLikesProps) {
               className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
             >
               {/* 排名 */}
-              <div className={`
-                flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold
-                ${(index + (currentPage - 1) * itemsPerPage) === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-lg' : ''}
-                ${(index + (currentPage - 1) * itemsPerPage) === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-white shadow-md' : ''}
-                ${(index + (currentPage - 1) * itemsPerPage) === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-md' : ''}
-                ${(index + (currentPage - 1) * itemsPerPage) === 3 ? 'bg-gradient-to-br from-blue-400 to-blue-500 text-white shadow-sm' : ''}
-                ${(index + (currentPage - 1) * itemsPerPage) === 4 ? 'bg-gradient-to-br from-purple-400 to-purple-500 text-white shadow-sm' : ''}
-                ${(index + (currentPage - 1) * itemsPerPage) > 4 ? 'bg-gray-200 text-gray-600' : ''}
-              `}>
-                {index + 1 + (currentPage - 1) * itemsPerPage}
-              </div>
+              {(() => {
+                const rank = index + 1 + (currentPage - 1) * itemsPerPage;
+                if (rank === 1) {
+                  return <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-xl">🥇</div>;
+                } else if (rank === 2) {
+                  return <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-xl">🥈</div>;
+                } else if (rank === 3) {
+                  return <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-xl">🥉</div>;
+                } else {
+                  return (
+                    <div className={`
+                      flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold
+                      ${rank === 4 ? 'bg-gradient-to-br from-blue-400 to-blue-500 text-white shadow-sm' : ''}
+                      ${rank === 5 ? 'bg-gradient-to-br from-purple-400 to-purple-500 text-white shadow-sm' : ''}
+                      ${rank > 5 ? 'bg-gray-200 text-gray-600' : ''}
+                    `}>
+                      {rank}
+                    </div>
+                  );
+                }
+              })()}
 
               {/* 内容 */}
               <div className="flex-1 min-w-0">
