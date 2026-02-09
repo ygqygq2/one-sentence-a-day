@@ -180,7 +180,7 @@ export default function Timeline({ initialSentences }: TimelineProps) {
                     lineHeight="relaxed"
                     mb={3}
                     lineClamp={2}
-                    _groupHover={{ lineClamp: "unset" }}
+                    _groupHover={{ lineClamp: 999 }}
                     transition="all 0.2s"
                     title={sentence.content}
                   >
