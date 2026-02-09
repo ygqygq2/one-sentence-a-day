@@ -28,7 +28,8 @@
   "keywords": [
     "nextjs",
     "typescript",
-    "tailwindcss"
+    "chakra-ui",
+    "cloudflare-kv"
   ],
   "author": "",
   "license": "ISC"

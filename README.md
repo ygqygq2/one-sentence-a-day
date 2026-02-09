@@ -14,21 +14,24 @@
 7. 合并完成后，点击 **Delete branch**。
 8. 等一会儿，网页就更新生效啦 ✅
 
-一个用 Next.js + TypeScript + Tailwind CSS 构建的静态网站，用于展示每天记录的一句话。
+一个用 Next.js + TypeScript + Chakra UI 构建的静态网站，用于展示每天记录的一句话。
 
 ## 特性
 
 - ✨ 时间线方式展示
+- � 点赞功能（Cloudflare KV 存储）
+- 🏆 点赞排行榜
 - 📱 响应式设计
 - ⚡ 懒加载，性能优化
-- 🎨 优雅的动画效果
+- 🎨 优雅的动画效果和深色模式
 - 📦 纯静态输出，可部署到任何静态托管服务
 
 ## 技术栈
 
 - [Next.js](https://nextjs.org/) - React 框架
 - [TypeScript](https://www.typescriptlang.org/) - 类型安全
-- [Tailwind CSS](https://tailwindcss.com/) - 样式框架
+- [Chakra UI](https://www.chakra-ui.com/) - React 组件库
+- [Cloudflare KV](https://developers.cloudflare.com/kv/) - 点赞数据存储
 
 ## 快速开始
 
