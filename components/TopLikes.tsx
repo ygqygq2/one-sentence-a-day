@@ -1,7 +1,7 @@
 "use client";
 
 import { Sentence } from '@/lib/data';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getTopLikes } from '@/lib/cloudflare-api';
 import { Box, Button, Flex, HStack, Skeleton, Text, VStack, Icon } from '@chakra-ui/react';
 import { Tooltip } from '@/components/ui/tooltip';
@@ -14,33 +14,69 @@ interface RankedSentence extends Sentence {
   likes: number;
 }
 
+/**
+ * 根据视口高度计算排行榜每页显示条数
+ * 纯数学计算，不依赖 DOM 测量，避免循环依赖
+ */
+function calcItemsFromViewport(): number {
+  if (typeof window === 'undefined') return 5;
+
+  const vh = window.innerHeight;
+
+  // 各区域高度预估（像素）:
+  // header: ~115(lg) / ~95(sm) / ~80(base)
+  // layout py*2: ~32
+  // container padding*2: ~48(lg) / ~40(sm) / ~32(base)
+  // title row + margin-bottom: ~48
+  // pagination + pt + border: ~56
+  // grid gap: ~24(lg)
+  // safety margin: ~30
+  const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+  const overhead = isDesktop ? 355 : 305;
+
+  // 单个卡片高度 ≈ minH(68px) + gap(10px) = 78px，取 80 更保守
+  const cardHeightWithGap = 80;
+
+  const available = vh - overhead;
+  return Math.max(3, Math.min(10, Math.floor(available / cardHeightWithGap)));
+}
+
 export default function TopLikes({ sentences }: TopLikesProps) {
   const [topSentences, setTopSentences] = useState<RankedSentence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [itemsPerPage, setItemsPerPage] = useState(10); // 初始值较大，等计算后更新
+  // lazy initializer：首次渲染前就计算好正确值，首次 fetch 即用正确的 pageSize
+  const [itemsPerPage, setItemsPerPage] = useState(() => calcItemsFromViewport());
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const firstItemRef = useRef<HTMLDivElement>(null);
 
   const sentenceMap = useMemo(() => {
     return new Map(sentences.map((s) => [s.date, s]));
   }, [sentences]);
 
-  const itemsPerPageRef = useRef(itemsPerPage);
-  
+  // 监听窗口大小变化，重新计算每页显示条数
   useEffect(() => {
-    itemsPerPageRef.current = itemsPerPage;
-  }, [itemsPerPage]);
+    let resizeTimer: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        setItemsPerPage(calcItemsFromViewport());
+      }, 150);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(resizeTimer);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
+  // 获取排行数据
   useEffect(() => {
     let active = true;
 
     async function fetchPage() {
       setIsLoading(true);
       try {
-        const data = await getTopLikes(currentPage, itemsPerPageRef.current);
+        const data = await getTopLikes(currentPage, itemsPerPage);
         if (!active) return;
 
         const ranked = data.items.map((item) => {
@@ -68,72 +104,7 @@ export default function TopLikes({ sentences }: TopLikesProps) {
       active = false;
       clearInterval(interval);
     };
-  }, [currentPage, sentenceMap]);
-
-  // 根据容器高度动态计算每页显示条数
-  useEffect(() => {
-    // 必须等数据加载完成且有内容才能计算
-    if (isLoading || !firstItemRef.current || !containerRef.current || !contentRef.current) {
-      return;
-    }
-
-    let resizeTimer: NodeJS.Timeout;
-    
-    const calculateItemsPerPage = () => {
-      const container = containerRef.current;
-      const content = contentRef.current;
-      const firstItem = firstItemRef.current;
-      
-      if (!container || !content || !firstItem) return;
-
-      // 获取容器总高度和内容区域的位置
-      const containerRect = container.getBoundingClientRect();
-      const contentRect = content.getBoundingClientRect();
-      
-      // 计算内容区域可用高度（容器底部 - 内容区域顶部 - 底部分页高度）
-      // 使用更大的预留空间确保分页组件一定能显示
-      const paginationHeight = 100; // 预估分页高度（包含边距和间距）
-      const safetyMargin = 40; // 额外的安全边距
-      const availableHeight = containerRect.bottom - contentRect.top - paginationHeight - safetyMargin;
-      
-      // 获取单个卡片的实际高度（包含间距）
-      const itemRect = firstItem.getBoundingClientRect();
-      const itemHeight = itemRect.height;
-      const gap = window.matchMedia('(min-width: 640px)').matches ? 10 : 8; // space-y
-      const totalItemHeight = itemHeight + gap;
-      
-      // 计算可以显示的条数：最少3条，最多8条（限制最大值避免挤压）
-      // 减2确保分页组件一定能完整显示
-      const calculated = Math.floor(availableHeight / totalItemHeight);
-      const items = Math.max(3, Math.min(8, calculated - 2));
-      
-      setItemsPerPage(prev => {
-        // 如果是首次计算或差异较大才更新
-        if (prev === 10 || Math.abs(prev - items) >= 2) {
-          return items;
-        }
-        return prev;
-      });
-    };
-
-    // 防抖处理
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(calculateItemsPerPage, 150);
-    };
-
-    // 首次计算需要短暂延迟，确保布局稳定
-    const initialTimer = setTimeout(calculateItemsPerPage, 100);
-
-    // 监听窗口大小变化
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      clearTimeout(resizeTimer);
-      clearTimeout(initialTimer);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [isLoading, topSentences.length]); // 依赖 isLoading 和数据长度
+  }, [currentPage, itemsPerPage, sentenceMap]);
 
   const totalPages = useMemo(() => {
     return Math.max(1, Math.ceil(total / itemsPerPage));
@@ -170,7 +141,6 @@ export default function TopLikes({ sentences }: TopLikesProps) {
 
   return (
     <Box
-      ref={containerRef}
       bg={{ base: "white", _dark: "gray.800" }}
       rounded="lg"
       shadow="md"
@@ -180,14 +150,15 @@ export default function TopLikes({ sentences }: TopLikesProps) {
       h="full"
       overflow="hidden"
     >
-      <Flex align="center" gap={2} mb={{ base: 3, sm: 4 }}>
+      <Flex align="center" gap={2} mb={{ base: 3, sm: 4 }} flexShrink={0}>
         <Text fontSize={{ base: "xl", sm: "2xl" }}>🏆</Text>
         <Text fontSize={{ base: "base", sm: "lg", lg: "xl" }} fontWeight="bold" color={{ base: "gray.800", _dark: "white" }}>
           点赞排行榜
         </Text>
       </Flex>
 
-      <VStack ref={contentRef} gap={{ base: 2, sm: 2.5 }} flex="1" minH="0" align="stretch">
+      {/* 卡片列表：flex=1 + overflowY auto 做兜底，即使计算偏差也能滚动 */}
+      <VStack gap={{ base: 2, sm: 2.5 }} flex="1" minH="0" align="stretch" overflowY="auto">
         {isLoading ? (
           <VStack gap={3}>
             {[1, 2, 3].map(i => (
@@ -207,7 +178,6 @@ export default function TopLikes({ sentences }: TopLikesProps) {
             return (
               <Flex
                 key={sentence.date}
-                ref={index === 0 ? firstItemRef : undefined}
                 align="flex-start"
                 gap={{ base: 2, sm: 3 }}
                 p={{ base: 2.5, sm: 3 }}
