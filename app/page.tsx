@@ -16,7 +16,7 @@ export default async function Home() {
       {/* 响应式两列布局 */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-4 lg:px-8 py-3 sm:py-4 overflow-y-auto lg:overflow-hidden">
         <div className="flex flex-col lg:grid lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-6 lg:h-full">
-          {/* 移动端：排行榜在上方 */}
+          {/* 移动端：排行榜在上方，固定高度 */}
           <aside className="lg:hidden w-full">
             <TopLikes sentences={sentences} />
           </aside>
@@ -26,8 +26,8 @@ export default async function Home() {
             <Timeline initialSentences={sentences} />
           </div>
 
-          {/* 桌面端：排行榜在右侧 */}
-          <aside className="hidden lg:block lg:col-span-4 lg:h-full lg:overflow-y-auto">
+          {/* 桌面端：排行榜在右侧，固定高度不滚动 */}
+          <aside className="hidden lg:block lg:col-span-4 lg:h-full">
             <TopLikes sentences={sentences} />
           </aside>
         </div>

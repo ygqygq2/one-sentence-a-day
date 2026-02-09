@@ -15,7 +15,7 @@ interface RankedSentence extends Sentence {
 export default function TopLikes({ sentences }: TopLikesProps) {
   const [topSentences, setTopSentences] = useState<RankedSentence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [itemsPerPage, setItemsPerPage] = useState(10); // 增加默认显示数
+  const [itemsPerPage, setItemsPerPage] = useState(5); // 移动端默认5条
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,47 +69,19 @@ export default function TopLikes({ sentences }: TopLikesProps) {
     };
   }, [currentPage, sentenceMap]);
 
-  // 根据容器高度动态计算每页条数
+  // 根据屏幕尺寸设置每页条数（移动端5条，桌面端10条）
   useEffect(() => {
-    if (!containerRef.current) return;
-
-    let timeoutId: NodeJS.Timeout;
-    let isFirstCalc = true;
-    
-    const calcItemsPerPage = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        const containerHeight = containerRef.current?.getBoundingClientRect().height || 0;
-        const headerHeight = headerRef.current?.getBoundingClientRect().height || 0;
-        const paginationHeight = paginationRef.current?.getBoundingClientRect().height || 0;
-        const itemHeight = firstItemRef.current?.getBoundingClientRect().height || 72;
-
-        const available = containerHeight - headerHeight - paginationHeight - 32; // 增加边距
-        const next = Math.max(5, Math.floor(available / itemHeight)); // 最少5条
-
-        setItemsPerPage((prev) => {
-          if (prev === next) return prev;
-          // 只在首次计算或变化超过2条时才更新，避免频繁抖动
-          if (isFirstCalc || Math.abs(prev - next) > 2) {
-            isFirstCalc = false;
-            return next;
-          }
-          return prev;
-        });
-      }, 300); // 增加防抖时间
+    const updateItemsPerPage = () => {
+      // lg 断点是 1024px
+      const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+      setItemsPerPage(isDesktop ? 10 : 5);
     };
 
-    const observer = new ResizeObserver(calcItemsPerPage);
-    observer.observe(containerRef.current);
-    if (headerRef.current) observer.observe(headerRef.current);
-    if (paginationRef.current) observer.observe(paginationRef.current);
-    if (firstItemRef.current) observer.observe(firstItemRef.current);
-
-    calcItemsPerPage();
+    updateItemsPerPage();
+    window.addEventListener('resize', updateItemsPerPage);
 
     return () => {
-      clearTimeout(timeoutId);
-      observer.disconnect();
+      window.removeEventListener('resize', updateItemsPerPage);
     };
   }, []);
 
@@ -142,7 +114,7 @@ export default function TopLikes({ sentences }: TopLikesProps) {
   };
 
   return (
-    <div ref={containerRef} className="bg-white rounded-lg shadow-md p-4 sm:p-6 h-full max-h-[600px] lg:max-h-none flex flex-col">
+    <div ref={containerRef} className="bg-white rounded-lg shadow-md p-4 sm:p-5 lg:p-6 flex flex-col h-auto lg:h-full">
       <div ref={headerRef}>
         <h2 className="text-base sm:text-lg lg:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
           <span className="text-xl sm:text-2xl">🏆</span>
@@ -150,7 +122,7 @@ export default function TopLikes({ sentences }: TopLikesProps) {
         </h2>
       </div>
 
-      <div className="space-y-2 sm:space-y-3 flex-1 min-h-0">
+      <div className="space-y-2 sm:space-y-2.5 flex-1 min-h-0">
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map(i => (
@@ -167,7 +139,7 @@ export default function TopLikes({ sentences }: TopLikesProps) {
             <div
               key={sentence.date}
               ref={index === 0 ? firstItemRef : undefined}
-              className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg hover:bg-gray-50 transition-colors min-h-[60px] sm:min-h-[68px]"
             >
               {/* 排名 */}
               {(() => {
