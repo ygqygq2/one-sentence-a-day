@@ -91,8 +91,10 @@ export default function TopLikes({ sentences }: TopLikesProps) {
       const contentRect = content.getBoundingClientRect();
       
       // 计算内容区域可用高度（容器底部 - 内容区域顶部 - 底部分页高度）
-      const paginationHeight = 60; // 预估分页高度
-      const availableHeight = containerRect.bottom - contentRect.top - paginationHeight;
+      // 增加预估分页高度，确保分页组件一定能显示
+      const paginationHeight = 80; // 预估分页高度（包含边距）
+      const safetyMargin = 20; // 额外的安全边距
+      const availableHeight = containerRect.bottom - contentRect.top - paginationHeight - safetyMargin;
       
       // 获取单个卡片的实际高度（包含间距）
       const itemRect = firstItem.getBoundingClientRect();
@@ -101,8 +103,9 @@ export default function TopLikes({ sentences }: TopLikesProps) {
       const totalItemHeight = itemHeight + gap;
       
       // 计算可以显示的条数：最少3条，最多20条
+      // 再减1确保分页组件一定能完整显示
       const calculated = Math.floor(availableHeight / totalItemHeight);
-      const items = Math.max(3, Math.min(20, calculated));
+      const items = Math.max(3, Math.min(20, calculated - 1));
       
       setItemsPerPage(prev => {
         // 如果是首次计算或差异较大才更新
