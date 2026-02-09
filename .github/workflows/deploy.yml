@@ -30,6 +30,8 @@ jobs:
         run: npm install
         
       - name: 构建 Next.js
+        env:
+          NEXT_PUBLIC_WORKER_URL: ${{ vars.WORKER_URL }}
         run: npm run build
         
       - name: 上传构建产物
