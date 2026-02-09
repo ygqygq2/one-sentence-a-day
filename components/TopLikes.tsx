@@ -3,8 +3,9 @@
 import { Sentence } from '@/lib/data';
 import { useEffect, useMemo, useState } from 'react';
 import { getTopLikes } from '@/lib/cloudflare-api';
-import { Box, Button, Flex, HStack, Skeleton, Text, VStack, Icon } from '@chakra-ui/react';
+import { Box, Button, Flex, HStack, Skeleton, Text, VStack } from '@chakra-ui/react';
 import { Tooltip } from '@/components/ui/tooltip';
+import LikeButton from './LikeButton';
 
 interface TopLikesProps {
   sentences: Sentence[];
@@ -48,6 +49,7 @@ export default function TopLikes({ sentences }: TopLikesProps) {
   const [itemsPerPage, setItemsPerPage] = useState(() => calcItemsFromViewport());
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [likes, setLikes] = useState<{ [date: string]: number }>({});
 
   const sentenceMap = useMemo(() => {
     return new Map(sentences.map((s) => [s.date, s]));
@@ -90,6 +92,13 @@ export default function TopLikes({ sentences }: TopLikesProps) {
 
         setTopSentences(ranked);
         setTotal(data.total || 0);
+        
+        // Update likes state for LikeButton components
+        const likesData: { [date: string]: number } = {};
+        ranked.forEach((item) => {
+          likesData[item.date] = item.likes;
+        });
+        setLikes((prev) => ({ ...prev, ...likesData }));
       } catch (error) {
         console.error('Failed to fetch likes:', error);
       } finally {
@@ -132,12 +141,6 @@ export default function TopLikes({ sentences }: TopLikesProps) {
     const [year, month, day] = dateStr.split('-');
     return `${parseInt(month)}月${parseInt(day)}日`;
   };
-
-  const HeartIcon = () => (
-    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-    </svg>
-  );
 
   return (
     <Box
@@ -231,13 +234,22 @@ export default function TopLikes({ sentences }: TopLikesProps) {
                   </Tooltip>
                 </Box>
 
-                {/* 点赞数 */}
-                <Flex flexShrink={0} align="center" gap={{ base: 0.5, sm: 1 }} color="pink.600">
-                  <Icon as={HeartIcon} boxSize={{ base: 3.5, sm: 4 }} />
-                  <Text fontSize={{ base: "xs", sm: "sm" }} fontWeight="semibold">
-                    {sentence.likes}
-                  </Text>
-                </Flex>
+                {/* 点赞按钮 */}
+                <Box flexShrink={0}>
+                  <LikeButton
+                    date={sentence.date}
+                    initialLikes={likes[sentence.date] || sentence.likes}
+                    onLikeChange={(newCount) => {
+                      setLikes(prev => ({ ...prev, [sentence.date]: newCount }));
+                      // Update the sentence likes in the topSentences array as well
+                      setTopSentences(prevSentences => 
+                        prevSentences.map(s => 
+                          s.date === sentence.date ? { ...s, likes: newCount } : s
+                        )
+                      );
+                    }}
+                  />
+                </Box>
               </Flex>
             );
           })
