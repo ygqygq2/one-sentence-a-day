@@ -246,7 +246,11 @@ export default function TopLikes({ sentences }: TopLikesProps) {
                   <Text fontSize="xs" color={{ base: "gray.500", _dark: "gray.400" }} mb={{ base: 0.5, sm: 1 }}>
                     {formatDate(sentence.date)}
                   </Text>
-                  <Tooltip content={sentence.content} showArrow>
+                  <Tooltip 
+                    content={sentence.content} 
+                    showArrow
+                    disabled={sentence.content.length <= 50}
+                  >
                     <Text fontSize={{ base: "xs", sm: "sm" }} color={{ base: "gray.700", _dark: "gray.200" }} lineClamp={2}>
                       {sentence.content}
                     </Text>
