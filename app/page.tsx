@@ -40,7 +40,11 @@ export default async function Home() {
         mx="auto"
         py={{ base: 3, sm: 4 }}
         px={{ base: 3, sm: 4, lg: 8 }}
-        h="calc(100vh - 100px)"
+        h={{
+          base: "calc(100vh - 80px)",  // 移动端: py=3*2 + 标题内容 ≈ 80px
+          sm: "calc(100vh - 95px)",    // 平板: py=4*2 + 标题内容 ≈ 95px  
+          lg: "calc(100vh - 115px)"    // 桌面: py=6*2 + 标题内容 ≈ 115px
+        }}
       >
         <Grid
           templateColumns={{ base: "1fr", lg: "2fr 1fr" }}
