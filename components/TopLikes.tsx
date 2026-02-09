@@ -4,6 +4,7 @@ import { Sentence } from '@/lib/data';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getTopLikes } from '@/lib/cloudflare-api';
 import { Box, Button, Flex, HStack, Skeleton, Text, VStack, Icon } from '@chakra-ui/react';
+import { Tooltip } from '@/components/ui/tooltip';
 
 interface TopLikesProps {
   sentences: Sentence[];
@@ -245,9 +246,11 @@ export default function TopLikes({ sentences }: TopLikesProps) {
                   <Text fontSize="xs" color={{ base: "gray.500", _dark: "gray.400" }} mb={{ base: 0.5, sm: 1 }}>
                     {formatDate(sentence.date)}
                   </Text>
-                  <Text fontSize={{ base: "xs", sm: "sm" }} color={{ base: "gray.700", _dark: "gray.200" }} lineClamp={2}>
-                    {sentence.content}
-                  </Text>
+                  <Tooltip content={sentence.content} showArrow>
+                    <Text fontSize={{ base: "xs", sm: "sm" }} color={{ base: "gray.700", _dark: "gray.200" }} lineClamp={2}>
+                      {sentence.content}
+                    </Text>
+                  </Tooltip>
                 </Box>
 
                 {/* 点赞数 */}
