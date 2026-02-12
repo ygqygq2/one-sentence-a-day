@@ -168,8 +168,8 @@ export default function TopLikes({ sentences }: TopLikesProps) {
           <VStack gap={3}>
             {[1, 2, 3].map(i => (
               <Box key={i}>
-                <Skeleton h={4} w="75%" mb={2} />
-                <Skeleton h={3} w="50%" />
+                <Skeleton h={4} w="75%" mb={2} colorPalette="gray" />
+                <Skeleton h={3} w="50%" colorPalette="gray" />
               </Box>
             ))}
           </VStack>
