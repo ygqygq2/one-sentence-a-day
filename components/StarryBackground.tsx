@@ -142,20 +142,23 @@ export default function StarryBackground() {
           for (let i = 0; i < meteor.trail.length - 1; i++) {
             const point = meteor.trail[i]
             const nextPoint = meteor.trail[i + 1]
+            // Calculate progress from tail (0) to head (1)
             const trailProgress = i / meteor.trail.length
-            const opacity = point.opacity * (1 - trailProgress) * 0.8
+            // Reverse the opacity calculation: brightest at head, dimmest at tail
+            const opacity = point.opacity * trailProgress * 0.9
 
-            // Create gradient for meteor tail
+            // Create gradient for meteor tail with reversed brightness
             const gradient = ctx.createLinearGradient(
               point.x, point.y,
               nextPoint.x, nextPoint.y
             )
-            gradient.addColorStop(0, `rgba(200, 220, 255, ${opacity * 0.3})`)
-            gradient.addColorStop(0.5, `rgba(150, 180, 255, ${opacity * 0.6})`)
-            gradient.addColorStop(1, `rgba(100, 150, 255, ${opacity})`)
+            gradient.addColorStop(0, `rgba(100, 150, 255, ${opacity * 0.2})`)
+            gradient.addColorStop(0.5, `rgba(150, 180, 255, ${opacity * 0.5})`)
+            gradient.addColorStop(1, `rgba(200, 220, 255, ${opacity})`)
 
             ctx.strokeStyle = gradient
-            ctx.lineWidth = 2 + (1 - trailProgress) * 2
+            // Thickest at head (when trailProgress is high), thinnest at tail
+            ctx.lineWidth = 1 + trailProgress * 4
             ctx.beginPath()
             ctx.moveTo(point.x, point.y)
             ctx.lineTo(nextPoint.x, nextPoint.y)
@@ -163,25 +166,26 @@ export default function StarryBackground() {
           }
         }
 
-        // Draw meteor head with glow
+        // Draw meteor head with enhanced size and glow
         const headGradient = ctx.createRadialGradient(
           meteor.x, meteor.y, 0,
-          meteor.x, meteor.y, 5
+          meteor.x, meteor.y, 8
         )
         headGradient.addColorStop(0, `rgba(255, 255, 255, ${meteor.opacity})`)
-        headGradient.addColorStop(0.5, `rgba(200, 220, 255, ${meteor.opacity * 0.8})`)
-        headGradient.addColorStop(1, `rgba(150, 180, 255, ${meteor.opacity * 0.2})`)
+        headGradient.addColorStop(0.3, `rgba(240, 245, 255, ${meteor.opacity * 0.9})`)
+        headGradient.addColorStop(0.6, `rgba(200, 220, 255, ${meteor.opacity * 0.6})`)
+        headGradient.addColorStop(1, `rgba(150, 180, 255, ${meteor.opacity * 0.1})`)
 
         ctx.fillStyle = headGradient
         ctx.beginPath()
-        ctx.arc(meteor.x, meteor.y, 3, 0, Math.PI * 2)
+        ctx.arc(meteor.x, meteor.y, 5, 0, Math.PI * 2)
         ctx.fill()
 
-        // Add bright glow
-        ctx.shadowBlur = 15
-        ctx.shadowColor = `rgba(200, 220, 255, ${meteor.opacity})`
+        // Add bright glow around the head
+        ctx.shadowBlur = 20
+        ctx.shadowColor = `rgba(220, 235, 255, ${meteor.opacity * 0.8})`
         ctx.beginPath()
-        ctx.arc(meteor.x, meteor.y, 2, 0, Math.PI * 2)
+        ctx.arc(meteor.x, meteor.y, 3, 0, Math.PI * 2)
         ctx.fill()
         ctx.shadowBlur = 0
 
