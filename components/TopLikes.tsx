@@ -274,6 +274,7 @@ export default function TopLikes({ sentences }: TopLikesProps) {
               <Button
                 size="sm"
                 variant="outline"
+                colorPalette="gray"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
               >
@@ -287,6 +288,7 @@ export default function TopLikes({ sentences }: TopLikesProps) {
               <Button
                 size="sm"
                 variant="outline"
+                colorPalette="gray"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
               >
@@ -299,6 +301,7 @@ export default function TopLikes({ sentences }: TopLikesProps) {
               <Button
                 size="sm"
                 variant="outline"
+                colorPalette="gray"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
               >
@@ -324,6 +327,7 @@ export default function TopLikes({ sentences }: TopLikesProps) {
               <Button
                 size="sm"
                 variant="outline"
+                colorPalette="gray"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
               >

@@ -172,52 +172,60 @@ export default function StarryBackground() {
         // Fade out slower for longer visibility
         meteor.opacity -= 0.005
 
-        // Draw meteor trail - using filled path for smooth continuous appearance
+        // Draw meteor trail as a continuous smooth gradient path
         if (meteor.trail.length > 2) {
           ctx.save()
           ctx.globalCompositeOperation = 'lighter'
           
-          // Draw trail as a tapered shape using quadratic curves for smoothness
-          for (let i = 0; i < meteor.trail.length - 1; i++) {
-            const point = meteor.trail[i]
+          // Create a smooth continuous path using quadratic curves
+          ctx.beginPath()
+          
+          // Start at the first trail point
+          const firstPoint = meteor.trail[0]
+          ctx.moveTo(firstPoint.x, firstPoint.y)
+          
+          // Draw smooth curve through all trail points
+          for (let i = 1; i < meteor.trail.length - 1; i++) {
+            const currentPoint = meteor.trail[i]
             const nextPoint = meteor.trail[i + 1]
             
-            // Calculate progress from tail (0) to head (1)
-            const trailProgress = i / meteor.trail.length
-            // Opacity brightest at head, dimmest at tail
-            const opacity = point.opacity * trailProgress * 0.8
-            
-            // Width tapers from tail to head
-            const width = 0.5 + trailProgress * 3.5
-            
-            // Calculate perpendicular offset for width
-            const dx = nextPoint.x - point.x
-            const dy = nextPoint.y - point.y
-            const length = Math.sqrt(dx * dx + dy * dy)
-            
-            if (length > 0) {
-              const perpX = -dy / length * width
-              const perpY = dx / length * width
-              
-              // Draw filled quadrilateral with gradient
-              const gradient = ctx.createLinearGradient(
-                point.x, point.y,
-                nextPoint.x, nextPoint.y
-              )
-              gradient.addColorStop(0, `rgba(120, 160, 255, ${opacity * 0.3})`)
-              gradient.addColorStop(0.5, `rgba(160, 190, 255, ${opacity * 0.6})`)
-              gradient.addColorStop(1, `rgba(200, 220, 255, ${opacity})`)
-              
-              ctx.fillStyle = gradient
-              ctx.beginPath()
-              ctx.moveTo(point.x - perpX, point.y - perpY)
-              ctx.lineTo(point.x + perpX, point.y + perpY)
-              ctx.lineTo(nextPoint.x + perpX, nextPoint.y + perpY)
-              ctx.lineTo(nextPoint.x - perpX, nextPoint.y - perpY)
-              ctx.closePath()
-              ctx.fill()
-            }
+            // Use quadratic curve to smooth between points
+            const cpX = (currentPoint.x + nextPoint.x) / 2
+            const cpY = (currentPoint.y + nextPoint.y) / 2
+            ctx.quadraticCurveTo(currentPoint.x, currentPoint.y, cpX, cpY)
           }
+          
+          // Complete the path to the last point
+          const lastPoint = meteor.trail[meteor.trail.length - 1]
+          ctx.lineTo(lastPoint.x, lastPoint.y)
+          
+          // Create gradient along the trail for smooth fade effect
+          const gradient = ctx.createLinearGradient(
+            firstPoint.x, firstPoint.y,
+            lastPoint.x, lastPoint.y
+          )
+          
+          // Gradient from tail (transparent) to head (bright)
+          gradient.addColorStop(0, `rgba(120, 160, 255, 0)`)
+          gradient.addColorStop(0.3, `rgba(140, 180, 255, ${meteor.opacity * 0.3})`)
+          gradient.addColorStop(0.6, `rgba(180, 210, 255, ${meteor.opacity * 0.6})`)
+          gradient.addColorStop(1, `rgba(220, 240, 255, ${meteor.opacity * 0.9})`)
+          
+          // Draw the trail with varying width for taper effect
+          ctx.strokeStyle = gradient
+          ctx.lineWidth = 3
+          ctx.lineCap = 'round'
+          ctx.lineJoin = 'round'
+          ctx.shadowBlur = 8
+          ctx.shadowColor = `rgba(180, 210, 255, ${meteor.opacity * 0.6})`
+          ctx.stroke()
+          
+          // Draw a second, thinner bright core line for extra luminosity
+          ctx.strokeStyle = `rgba(255, 255, 255, ${meteor.opacity * 0.8})`
+          ctx.lineWidth = 1.5
+          ctx.shadowBlur = 4
+          ctx.shadowColor = `rgba(255, 255, 255, ${meteor.opacity * 0.5})`
+          ctx.stroke()
           
           ctx.restore()
         }
