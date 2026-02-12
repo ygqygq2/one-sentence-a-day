@@ -176,16 +176,12 @@ export default function StarryBackground() {
         headGradient.addColorStop(0.6, `rgba(200, 220, 255, ${meteor.opacity * 0.6})`)
         headGradient.addColorStop(1, `rgba(150, 180, 255, ${meteor.opacity * 0.1})`)
 
+        // Apply glow effect to the head
+        ctx.shadowBlur = 20
+        ctx.shadowColor = `rgba(220, 235, 255, ${meteor.opacity * 0.8})`
         ctx.fillStyle = headGradient
         ctx.beginPath()
         ctx.arc(meteor.x, meteor.y, 5, 0, Math.PI * 2)
-        ctx.fill()
-
-        // Add bright glow around the head
-        ctx.shadowBlur = 20
-        ctx.shadowColor = `rgba(220, 235, 255, ${meteor.opacity * 0.8})`
-        ctx.beginPath()
-        ctx.arc(meteor.x, meteor.y, 3, 0, Math.PI * 2)
         ctx.fill()
         ctx.shadowBlur = 0
 
