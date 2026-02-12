@@ -3,12 +3,14 @@ import Timeline from "@/components/Timeline";
 import TopLikes from "@/components/TopLikes";
 import { Box, Grid, GridItem, Heading, Text } from "@chakra-ui/react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import VisualEffects from "@/components/VisualEffects";
 
 export default async function Home() {
   const sentences = await getAllSentences();
 
   return (
     <Box h="100vh" overflow="hidden" bg={{ base: "gray.50", _dark: "gray.900" }}>
+      <VisualEffects />
       {/* 标题 */}
       <Box
         as="header"
