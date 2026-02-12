@@ -84,7 +84,11 @@ export default function StarryBackground() {
 
     // Animation loop
     const animate = (timestamp: number) => {
-      ctx.fillStyle = "rgba(17, 24, 39, 0.1)" // Slight fade effect for trails
+      // Clear canvas completely to avoid gray traces
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      
+      // Redraw background
+      ctx.fillStyle = "rgb(17, 24, 39)"
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       // Draw and update stars
@@ -110,9 +114,13 @@ export default function StarryBackground() {
         }
       })
 
-      // Create meteors randomly
-      if (timestamp - lastMeteorTimeRef.current > 2000 + Math.random() * 3000) {
-        createMeteor()
+      // Create meteors randomly - increased frequency and multiple meteors
+      if (timestamp - lastMeteorTimeRef.current > 1000 + Math.random() * 2000) {
+        // Create 2-3 meteors at once with slight variation in timing
+        const meteorCount = Math.floor(Math.random() * 2) + 2 // 2-3 meteors
+        for (let i = 0; i < meteorCount; i++) {
+          setTimeout(() => createMeteor(), i * (100 + Math.random() * 200))
+        }
         lastMeteorTimeRef.current = timestamp
       }
 
@@ -129,15 +137,15 @@ export default function StarryBackground() {
           opacity: meteor.opacity 
         })
 
-        // Keep trail length
-        if (meteor.trail.length > 30) {
+        // Keep trail length longer for continuous effect
+        if (meteor.trail.length > 50) {
           meteor.trail.shift()
         }
 
-        // Fade out
-        meteor.opacity -= 0.008
+        // Fade out slower for longer visibility
+        meteor.opacity -= 0.005
 
-        // Draw meteor trail
+        // Draw meteor trail - more continuous rendering
         if (meteor.trail.length > 1) {
           for (let i = 0; i < meteor.trail.length - 1; i++) {
             const point = meteor.trail[i]
@@ -159,6 +167,8 @@ export default function StarryBackground() {
             ctx.strokeStyle = gradient
             // Thickest at head (when trailProgress is high), thinnest at tail
             ctx.lineWidth = 1 + trailProgress * 4
+            ctx.lineCap = 'round' // Make lines smooth and continuous
+            ctx.lineJoin = 'round' // Make connections smooth
             ctx.beginPath()
             ctx.moveTo(point.x, point.y)
             ctx.lineTo(nextPoint.x, nextPoint.y)
@@ -185,13 +195,13 @@ export default function StarryBackground() {
         ctx.fill()
         ctx.shadowBlur = 0
 
-        // Keep meteor if still visible and on screen
+        // Keep meteor if still visible - extended bounds to pass through entire page
         return (
           meteor.opacity > 0 &&
-          meteor.x > -100 &&
-          meteor.x < canvas.width + 100 &&
-          meteor.y > -100 &&
-          meteor.y < canvas.height + 100
+          meteor.x > -200 &&
+          meteor.x < canvas.width + 200 &&
+          meteor.y > -200 &&
+          meteor.y < canvas.height + 200
         )
       })
 
