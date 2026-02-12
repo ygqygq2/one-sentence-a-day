@@ -54,7 +54,7 @@ export default async function Home() {
           h="full"
         >
           {/* 移动端：排行榜在上方 */}
-          <GridItem display={{ base: "block", lg: "none" }}>
+          <GridItem display={{ base: "block", lg: "none" }} h="full">
             <TopLikes sentences={sentences} />
           </GridItem>
 
@@ -90,7 +90,7 @@ export default async function Home() {
           </GridItem>
 
           {/* 桌面端：排行榜在右侧 */}
-          <GridItem display={{ base: "none", lg: "block" }} h="full">
+          <GridItem display={{ base: "none", lg: "flex" }} h="full">
             <TopLikes sentences={sentences} />
           </GridItem>
         </Grid>
