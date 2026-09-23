@@ -5,6 +5,9 @@ const eslintConfig = [
   ...nextCoreWebVitals,
   ...nextTypeScript,
   {
+    ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "coverage/**"],
+  },
+  {
     rules: {
       "import/no-anonymous-default-export": "off",
       "react-hooks/set-state-in-effect": "off",
