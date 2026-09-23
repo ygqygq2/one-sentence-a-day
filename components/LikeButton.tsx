@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { addLike, hasLiked, markAsLiked } from '@/lib/cloudflare-api';
-import { Button, Icon, Text, Box } from '@chakra-ui/react';
+import { addLike } from '@/lib/cloudflare-api';
+import { Button, Text, Box } from '@chakra-ui/react';
 
 interface LikeButtonProps {
   date: string;

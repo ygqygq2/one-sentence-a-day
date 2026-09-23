@@ -132,7 +132,7 @@ export default function TopLikes({ sentences }: TopLikesProps) {
   const pageNumbers = useMemo(() => {
     const maxButtons = 5;
     let start = Math.max(1, currentPage - Math.floor(maxButtons / 2));
-    let end = Math.min(totalPages, start + maxButtons - 1);
+    const end = Math.min(totalPages, start + maxButtons - 1);
     if (end - start + 1 < maxButtons) {
       start = Math.max(1, end - maxButtons + 1);
     }
@@ -140,7 +140,7 @@ export default function TopLikes({ sentences }: TopLikesProps) {
   }, [currentPage, totalPages]);
 
   const formatDate = (dateStr: string) => {
-    const [year, month, day] = dateStr.split('-');
+    const [, month, day] = dateStr.split('-');
     return `${parseInt(month)}月${parseInt(day)}日`;
   };
 

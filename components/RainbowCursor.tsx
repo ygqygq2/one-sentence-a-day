@@ -70,7 +70,7 @@ export default function RainbowCursor() {
       )
 
       // Draw particles
-      particlesRef.current.forEach((particle, index) => {
+      particlesRef.current.forEach((particle) => {
         const age = now - particle.createdAt
         const progress = age / maxAge
         const opacity = 1 - progress
