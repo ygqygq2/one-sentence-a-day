@@ -38,7 +38,7 @@
 ### 安装依赖
 
 ```bash
-npm install
+npm ci
 ```
 
 ### 本地开发
@@ -56,6 +56,12 @@ npm run build
 ```
 
 构建完成后，静态文件将输出到 `out` 目录。
+
+### 代码检查
+
+```bash
+npm run lint
+```
 
 ## 使用方法
 

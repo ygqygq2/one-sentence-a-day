@@ -25,9 +25,13 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "20"
+          cache: "npm"
           
       - name: 安装依赖
-        run: npm install
+        run: npm ci
+
+      - name: 代码检查
+        run: npm run lint
         
       - name: 构建 Next.js
         env:
